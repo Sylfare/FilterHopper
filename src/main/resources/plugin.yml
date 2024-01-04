@@ -1,0 +1,5 @@
+main: re.sylfa.filterhopper.FilterHopper
+author: Sylfare
+name: FilterHopper
+version: '${project.version}'
+api-version: "1.19"
