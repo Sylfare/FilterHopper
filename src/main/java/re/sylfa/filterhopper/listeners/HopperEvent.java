@@ -3,6 +3,7 @@ package re.sylfa.filterhopper.listeners;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
+import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.event.inventory.InventoryType;
 
 import re.sylfa.filterhopper.Filter;
@@ -27,5 +28,13 @@ public class HopperEvent implements Listener {
         if (!filter.checks(event.getItem())) {
             event.setCancelled(true);
         }
+    }
+
+    @EventHandler
+    public void onPickup(InventoryPickupItemEvent event) {
+        Filter filter = Filter.getFromBlock(event.getInventory());
+        if (filter == null || filter.type() == null)
+            return;
+        if(!filter.checks(event.getItem().getItemStack())) event.setCancelled(true);
     }
 }

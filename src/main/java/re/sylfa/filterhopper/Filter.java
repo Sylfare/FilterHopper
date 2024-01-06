@@ -1,8 +1,10 @@
 package re.sylfa.filterhopper;
 
 import org.bukkit.Material;
+import org.bukkit.Nameable;
 import org.bukkit.block.Block;
 import org.bukkit.block.Hopper;
+import org.bukkit.entity.minecart.HopperMinecart;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -38,7 +40,7 @@ public record Filter(Material type) {
         return this.type == null ? "filtre vide" : this.type.toString();
     }
 
-    public static Filter getFromBlock(Hopper hopper) {
+    public static Filter getFromBlock(Nameable hopper) {
         if(hopper.customName() == null) return null;
         if (!getPlainName(hopper.customName()).startsWith("FILTER|"))
             return null;
@@ -47,8 +49,8 @@ public record Filter(Material type) {
     }
 
     public static Filter getFromBlock(Inventory destination) {
-        if (!(destination.getHolder() instanceof Hopper)) return null;
-        return getFromBlock((Hopper) destination.getHolder());
+        if (!(destination.getHolder() instanceof Hopper || destination.getHolder() instanceof HopperMinecart)) return null;
+        return getFromBlock((Nameable) destination.getHolder());
     }
 
     public static Filter getFromBlock(Block block) {
