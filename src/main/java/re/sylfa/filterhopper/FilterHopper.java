@@ -14,12 +14,12 @@ public class FilterHopper extends JavaPlugin {
     static CommandSender cs = Bukkit.getConsoleSender();
     static Component prefix = Component.text("[FilterHopper] ");
     private static PluginManager pm = Bukkit.getPluginManager();
-   
+    public static FilterHopper plugin;
 
     @Override
     public void onEnable() {
         pm.registerEvents(new HopperEvent(), this);
-
+        plugin = this;
 
         Log.log(Component.text("Enabled").color(NamedTextColor.GREEN));
     }

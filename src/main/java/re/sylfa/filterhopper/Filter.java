@@ -1,7 +1,13 @@
 package re.sylfa.filterhopper;
 
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.Hopper;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 public record Filter(Material type) {
     /**
@@ -32,4 +38,28 @@ public record Filter(Material type) {
         return this.type == null ? "filtre vide" : this.type.toString();
     }
 
+    public static Filter getFromBlock(Hopper hopper) {
+        if(hopper.customName() == null) return null;
+        if (!getPlainName(hopper.customName()).startsWith("FILTER|"))
+            return null;
+
+        return Filter.deserialize(getPlainName(hopper.customName()));
+    }
+
+    public static Filter getFromBlock(Inventory destination) {
+        if (!(destination.getHolder() instanceof Hopper)) return null;
+        return getFromBlock((Hopper) destination.getHolder());
+    }
+
+    public static Filter getFromBlock(Block block) {
+        if (block.getType() != Material.HOPPER)
+            return null;
+        return getFromBlock((Hopper) block.getState());
+    }
+
+    private static String getPlainName(Component component) {
+        return PlainTextComponentSerializer.plainText().serialize(component);
+    }
+
+    
 }
