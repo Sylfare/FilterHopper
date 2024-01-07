@@ -3,6 +3,8 @@ package re.sylfa.filterhopper;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.math.NumberUtils;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 
 public record DurabilityFilter(DurabilityFilter.Type type, int limit) {
     
@@ -20,6 +22,24 @@ public record DurabilityFilter(DurabilityFilter.Type type, int limit) {
         int limit = Integer.parseInt(limitRaw);
 
         return new DurabilityFilter(type, limit);
+    }
+
+    public boolean checks(ItemStack item){
+
+        // if the item does not have durability, don't check it
+        boolean hasDurability = item.getType().getMaxDurability() != 0;
+        if (!hasDurability) return true;
+
+        int itemDurability = item.getType().getMaxDurability() - ((Damageable)item.getItemMeta()).getDamage();
+
+        return switch (this.type) {
+            case ANY          -> true;
+            case EQUALS       -> itemDurability == this.limit;
+            case LESS         -> itemDurability <  this.limit;
+            case LESSEQUAL    -> itemDurability <= this.limit;
+            case GREATER      -> itemDurability >  this.limit;
+            case GREATEREQUAL -> itemDurability >= this.limit;
+        };
     }
 
     public enum Type {

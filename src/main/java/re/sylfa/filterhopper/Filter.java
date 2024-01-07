@@ -28,7 +28,8 @@ public record Filter(Material type, boolean invertType, DurabilityFilter durabil
      * @return
      */
     public boolean checks(ItemStack item) {
-        return (this.type == item.getType()) != this.invertType;
+        boolean checkType = (this.type == item.getType()) != this.invertType;
+        return checkType && durabilityFilter.checks(item);
     }
 
     public String serialize() {
