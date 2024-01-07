@@ -1,6 +1,9 @@
 package re.sylfa.filterhopper;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.bukkit.Material;
@@ -14,7 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
-public record Filter(Material type, boolean invertType) {
+public record Filter(Material type, boolean invertType, DurabilityFilter durabilityFilter) {
 
     public static final String SEPARATOR = "|";
 
@@ -31,20 +34,26 @@ public record Filter(Material type, boolean invertType) {
     public String serialize() {
         return new StringBuilder("FILTER|")
                 .append(this.type.getKey().asString()).append(SEPARATOR)
-                .append(0)
+                .append(invertType ? "true" : "false")
+                .append(durabilityFilter.serialize())
                 .toString();
     }
 
     public static Filter deserialize(String string) {
-        if (!string.startsWith("FILTER"+SEPARATOR))
+        if (!string.startsWith("FILTER" + SEPARATOR))
             return null;
 
-        String[] args = Arrays.copyOf(string.split("\\"+SEPARATOR), 3);
+        List<String> split = Arrays.asList(string.split("\\"+ SEPARATOR))
+        .stream().map(value -> value == null ? "" : value).toList();
+        
+        ArrayList<String> args = new ArrayList<String>(Collections.nCopies(4, ""));
+        Collections.copy(args, split);
 
         Filter filter = new Filter(
-            Material.matchMaterial(args[1]),
-            ObjectUtils.defaultIfNull(args[2], "").equalsIgnoreCase("true")
-        );
+                Material.matchMaterial(args.get(1)),
+                ObjectUtils.defaultIfNull(args.get(2), "").equalsIgnoreCase("true"),
+                ObjectUtils.defaultIfNull(DurabilityFilter.deserialize(args.get(3)),
+                        new DurabilityFilter(DurabilityFilter.Type.ANY, 0)));
         return filter;
     }
 
@@ -53,15 +62,17 @@ public record Filter(Material type, boolean invertType) {
     }
 
     public static Filter getFromBlock(Nameable hopper) {
-        if(hopper.customName() == null) return null;
-        if (!getPlainName(hopper.customName()).startsWith("FILTER"+SEPARATOR))
+        if (hopper.customName() == null)
+            return null;
+        if (!getPlainName(hopper.customName()).startsWith("FILTER" + SEPARATOR))
             return null;
 
         return Filter.deserialize(getPlainName(hopper.customName()));
     }
 
     public static Filter getFromBlock(Inventory destination) {
-        if (!(destination.getHolder() instanceof Hopper || destination.getHolder() instanceof HopperMinecart)) return null;
+        if (!(destination.getHolder() instanceof Hopper || destination.getHolder() instanceof HopperMinecart))
+            return null;
         return getFromBlock((Nameable) destination.getHolder());
     }
 
@@ -75,5 +86,4 @@ public record Filter(Material type, boolean invertType) {
         return PlainTextComponentSerializer.plainText().serialize(component);
     }
 
-    
 }
