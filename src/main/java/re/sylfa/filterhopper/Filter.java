@@ -25,7 +25,7 @@ public record Filter(Material type, boolean invertType) {
      * @return
      */
     public boolean checks(ItemStack item) {
-        return this.type == item.getType();
+        return (this.type == item.getType()) != this.invertType;
     }
 
     public String serialize() {
