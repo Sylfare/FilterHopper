@@ -1,4 +1,4 @@
-package re.sylfa.filterhopper;
+package re.sylfa.filterhopper.utils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -6,6 +6,7 @@ import org.bukkit.inventory.ItemStack;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import re.sylfa.filterhopper.FilterHopper;
 
 public class Log {
     private static CommandSender cs = Bukkit.getConsoleSender();

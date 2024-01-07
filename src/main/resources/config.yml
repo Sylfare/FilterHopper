@@ -1,0 +1,4 @@
+i18n:
+  set-type: Type filter set
+  set-type-inverse: Type filter is now inverted
+  remove-type: Type removed
