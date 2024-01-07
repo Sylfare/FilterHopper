@@ -1,5 +1,8 @@
 package re.sylfa.filterhopper;
 
+import java.util.Arrays;
+
+import org.apache.commons.lang3.ObjectUtils;
 import org.bukkit.Material;
 import org.bukkit.Nameable;
 import org.bukkit.block.Block;
@@ -11,7 +14,10 @@ import org.bukkit.inventory.ItemStack;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
-public record Filter(Material type) {
+public record Filter(Material type, boolean invertType) {
+
+    public static final String SEPARATOR = "|";
+
     /**
      * Is the item is valid for this filter ?
      * 
@@ -24,16 +30,22 @@ public record Filter(Material type) {
 
     public String serialize() {
         return new StringBuilder("FILTER|")
-                .append(this.type.getKey().asString())
+                .append(this.type.getKey().asString()).append(SEPARATOR)
+                .append(0)
                 .toString();
     }
 
     public static Filter deserialize(String string) {
-        if (!string.startsWith("FILTER|"))
+        if (!string.startsWith("FILTER"+SEPARATOR))
             return null;
 
-        String[] args = string.split("\\|");
-        return new Filter(Material.matchMaterial(args[1]));
+        String[] args = Arrays.copyOf(string.split("\\"+SEPARATOR), 3);
+
+        Filter filter = new Filter(
+            Material.matchMaterial(args[1]),
+            ObjectUtils.defaultIfNull(args[2], "").equalsIgnoreCase("true")
+        );
+        return filter;
     }
 
     public String toString() {
@@ -42,7 +54,7 @@ public record Filter(Material type) {
 
     public static Filter getFromBlock(Nameable hopper) {
         if(hopper.customName() == null) return null;
-        if (!getPlainName(hopper.customName()).startsWith("FILTER|"))
+        if (!getPlainName(hopper.customName()).startsWith("FILTER"+SEPARATOR))
             return null;
 
         return Filter.deserialize(getPlainName(hopper.customName()));
