@@ -1,4 +1,4 @@
-package re.sylfa.filterhopper;
+package re.sylfa.filterhopper.filters;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,7 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
-public record Filter(Material type, boolean invertType, DurabilityFilter durabilityFilter) {
+public record Filter(TypeFilter typeFilter, DurabilityFilter durabilityFilter) {
 
     public static final String SEPARATOR = "|";
 
@@ -28,14 +28,13 @@ public record Filter(Material type, boolean invertType, DurabilityFilter durabil
      * @return
      */
     public boolean checks(ItemStack item) {
-        boolean checkType = (this.type == item.getType()) != this.invertType;
-        return checkType && durabilityFilter.checks(item);
+        return typeFilter.checks(item) && durabilityFilter.checks(item);
     }
 
     public String serialize() {
         return new StringBuilder("FILTER|")
-                .append(this.type.getKey().asString()).append(SEPARATOR)
-                .append(invertType ? "true" : "false")
+                .append(typeFilter.type().getKey().asString()).append(SEPARATOR)
+                .append(typeFilter.inverted() ? "true" : "false")
                 .append(durabilityFilter.serialize())
                 .toString();
     }
@@ -51,15 +50,14 @@ public record Filter(Material type, boolean invertType, DurabilityFilter durabil
         Collections.copy(args, split);
 
         Filter filter = new Filter(
-                Material.matchMaterial(args.get(1)),
-                ObjectUtils.defaultIfNull(args.get(2), "").equalsIgnoreCase("true"),
-                ObjectUtils.defaultIfNull(DurabilityFilter.deserialize(args.get(3)),
-                        new DurabilityFilter(DurabilityFilter.Type.ANY, 0)));
+            ObjectUtils.defaultIfNull(TypeFilter.deserialize(args.get(1), args.get(2)), new TypeFilter(Material.AIR, false)),
+            ObjectUtils.defaultIfNull(DurabilityFilter.deserialize(args.get(3)), new DurabilityFilter(DurabilityFilter.Type.ANY, 0))
+        );
         return filter;
     }
 
     public String toString() {
-        return this.type == null ? "filtre vide" : this.type.toString();
+        return this.typeFilter == null ? "filtre vide" : this.typeFilter.toString();
     }
 
     public static Filter getFromBlock(Nameable hopper) {

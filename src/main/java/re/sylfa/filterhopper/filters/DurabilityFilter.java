@@ -1,4 +1,4 @@
-package re.sylfa.filterhopper;
+package re.sylfa.filterhopper.filters;
 
 import java.util.stream.Stream;
 
