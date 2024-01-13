@@ -25,10 +25,10 @@ public record DurabilityFilter(DurabilityFilter.Type type, int limit) {
     }
 
     public boolean checks(ItemStack item){
-
+        
         // if the item does not have durability, don't check it
         boolean hasDurability = item.getType().getMaxDurability() != 0;
-        if (!hasDurability) return true;
+        if (!hasDurability) return type == Type.ANY;
 
         int itemDurability = item.getType().getMaxDurability() - ((Damageable)item.getItemMeta()).getDamage();
 

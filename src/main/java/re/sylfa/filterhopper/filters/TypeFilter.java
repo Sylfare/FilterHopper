@@ -5,10 +5,16 @@ import org.bukkit.inventory.ItemStack;
 
 public record TypeFilter(Material type, boolean inverted) {
     public boolean checks(ItemStack item) {
-        if (type == null)
-            return true;
+        boolean result;
+        if (type == null || type.equals(Material.AIR))
+            result = true;
+        else {
+            result = item.getType().equals(type);
+        }
 
-        return item.getType().equals(type) != inverted;
+        if(inverted) result = !result;
+        return result;
+
     }
 
     public String serialize() {
@@ -21,6 +27,6 @@ public record TypeFilter(Material type, boolean inverted) {
         Material matchMaterial = Material.matchMaterial(material);
         if (matchMaterial == null)
             matchMaterial = Material.AIR;
-        return new TypeFilter(matchMaterial, inverted == "true");
+        return new TypeFilter(matchMaterial, inverted.equalsIgnoreCase("true"));
     }
 }

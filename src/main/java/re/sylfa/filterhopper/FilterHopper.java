@@ -7,7 +7,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import re.sylfa.filterhopper.listeners.ClickEvent;
 import re.sylfa.filterhopper.listeners.HopperEvent;
 import re.sylfa.filterhopper.utils.Log;
 
